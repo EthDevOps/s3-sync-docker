@@ -13,4 +13,4 @@ echo "Verifying source..."
 /usr/bin/mc admin info s3_destination
 
 echo "Start mirror..."
-/usr/bin/mc mirror --watch --monitoring-address="0.0.0.0:8081" ${MINIO_EXTRA_OPTS} s3_source/${SOURCE_BUCKET} s3_destination/${DESTINATION_BUCKET}
+/usr/bin/mc mirror --overwrite ${MINIO_EXTRA_OPTS} s3_source/${SOURCE_BUCKET} s3_destination/${DESTINATION_BUCKET} && curl ${HEALTHCHECK_URL}

@@ -3,7 +3,7 @@
 A docker image to syncronise two S3-compatible storage buckets.
 It syncornizes only from the source to the destination.
 
-Sync is using the [minio-client](https://min.io/docs/minio/linux/reference/minio-mc.html)'s `mirror` command in `--watch` mode.
+Sync is using the [minio-client](https://min.io/docs/minio/linux/reference/minio-mc.html)'s `mirror` command.
 
 ## Configuration
 
@@ -18,7 +18,7 @@ All configuration is done via environment variables:
 - `DESTINATION_SECRET_KEY` - Secretkey/password for the destination
 - `DESTINATION_BUCKET` - The bucket on the destination to replicate
 - `MINIO_EXTRA_ARGS` - Additiona arguments to pass to the underlying `mc mirror` command
+- `HEALTHCHECK_URL` - URL to ping after the run
 
 ## Monitoring
 
-The `mc` client will expose metrics on port `8081/tcp`
