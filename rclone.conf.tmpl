@@ -1,0 +1,15 @@
+[sync_src]
+type = s3
+env_auth = false
+access_key_id = ${SOURCE_ACCESS_KEY}
+secret_access_key = ${SOURCE_SECRET_KEY}
+region = us-east-1
+endpoint = ${SOURCE_ENDPOINT}
+location_constraint = 
+server_side_encryption = 
+
+[sync_dst]
+type = b2
+account = ${DESTINATION_ACCESS_KEY}
+key = ${DESTINATION_SECRET_KEY}
+
