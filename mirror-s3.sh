@@ -15,4 +15,4 @@ if [[ "$MINIO_OVERWRITE" == "1" ]]; then
     OVERWRITE="--overwrite"
 fi
 
-rclone sync sync_src/${SOURCE_BUCKET} sync_dst/${DESTINATION_BUCKET} && curl ${HEALTHCHECK_URL}
+rclone --config=/etc/rclone.conf sync sync_src/${SOURCE_BUCKET} sync_dst/${DESTINATION_BUCKET} && curl ${HEALTHCHECK_URL}
