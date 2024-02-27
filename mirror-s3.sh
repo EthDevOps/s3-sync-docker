@@ -15,4 +15,10 @@ if [[ "$MINIO_OVERWRITE" == "1" ]]; then
     OVERWRITE="--overwrite"
 fi
 
-rclone --progress --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_BUCKET} && curl ${HEALTHCHECK_URL}
+BW_LIMIT=""
+
+if [ -n "$BANDWIDTH_LIMIT" ]]; then
+  echo "== BANDWIDTH LIMITER ENABLED ($BANDWIDTH_LIMIT) =="
+    BW_LIMIT="--bwlimit=$BANDWIDTH_LIMIT"
+fi
+rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_BUCKET} && curl ${HEALTHCHECK_URL}
