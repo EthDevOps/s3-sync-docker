@@ -1,6 +1,11 @@
 #!/bin/sh
 echo "Generating rclone config..."
-envsubst < /etc/rclone.conf.tmpl > /etc/rclone.conf
+TMPL="/etc/rclone.conf.tmp"
+if [ -n "$RCLONE_TMPL" ]; then
+    echo "== USING CUSTOM TEMPLATE =="
+    TMPL="$RCLONE_TMPL"
+fi
+envsubst < $TMPL > /etc/rclone.conf
 
 echo "Running rclone sync..."
 DEBUG=""
