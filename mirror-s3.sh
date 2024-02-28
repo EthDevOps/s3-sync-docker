@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "Generating rclone config..."
-TMPL="/etc/rclone.conf.tmp"
+TMPL="/etc/rclone.conf.tmpl"
 if [ -n "$RCLONE_TMPL" ]; then
     echo "== USING CUSTOM TEMPLATE: $RCLONE_TMPL =="
     TMPL="$RCLONE_TMPL"
