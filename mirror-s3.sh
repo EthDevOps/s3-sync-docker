@@ -30,9 +30,9 @@ fi
 if [ -n "$DO_ATOMIC" ]; then
   echo "== ATOMIC MODE ENABLED =="
   echo "=> Syncing from source..."
-  rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_TMP_BUCKET}
+  rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_TMP_BUCKET} --compare-dest=sync_dst:${DESTINATION_BUCKET}
   echo "=> Moving..."
-  rclone --config=/etc/rclone.conf move sync_dst:${DESTINATION_TMP_BUCKET} sync_dst:${DESTINATION_BUCKET} --delete-empty-src-dirs
+  rclone --config=/etc/rclone.conf move sync_dst:${DESTINATION_TMP_BUCKET} sync_dst:${DESTINATION_BUCKET}
 else
   echo "=> Syncing from source..."
   rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_BUCKET}
