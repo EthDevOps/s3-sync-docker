@@ -83,9 +83,9 @@ encrypt_and_sync() {
     # Upload encrypted files to destination
     echo "=> Uploading encrypted files to destination..."
     if [ -n "$compare_dest" ]; then
-        rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync "$encrypted_dir" "$destination" --compare-dest="$compare_dest"
+        rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync "$encrypted_dir" "$destination" --compare-dest="$compare_dest" ${EXTRA_SYNC_ARGS}
     else
-        rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync "$encrypted_dir" "$destination"
+        rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync "$encrypted_dir" "$destination" ${EXTRA_SYNC_ARGS}
     fi
     
     # Clean up temporary files
@@ -120,7 +120,7 @@ if [ -n "$DO_ATOMIC" ]; then
     rclone --config=/etc/rclone.conf move sync_dst:${DESTINATION_TMP_BUCKET} sync_dst:${DESTINATION_BUCKET}
   else
     echo "=> Syncing from source..."
-    rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_TMP_BUCKET} --compare-dest=sync_dst:${DESTINATION_BUCKET}
+    rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_TMP_BUCKET} --compare-dest=sync_dst:${DESTINATION_BUCKET} ${EXTRA_SYNC_ARGS}
     echo "=> Moving..."
     rclone --config=/etc/rclone.conf move sync_dst:${DESTINATION_TMP_BUCKET} sync_dst:${DESTINATION_BUCKET}
   fi
@@ -129,7 +129,7 @@ else
   if [ "$GPG_ENABLED" = true ]; then
     encrypt_and_sync "sync_src:${SOURCE_BUCKET}" "sync_dst:${DESTINATION_BUCKET}"
   else
-    rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_BUCKET}
+    rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} sync_dst:${DESTINATION_BUCKET} ${EXTRA_SYNC_ARGS}
   fi
 fi
 
