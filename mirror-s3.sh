@@ -1,4 +1,5 @@
 #!/bin/sh
+set -xv
 echo "Generating rclone config..."
 TMPL="/etc/rclone.conf.tmpl"
 if [ -n "$RCLONE_TMPL" ]; then
