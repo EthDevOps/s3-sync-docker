@@ -1,5 +1,11 @@
 #!/bin/sh
-set -xv
+# Fail on any error so a broken sync can never report success. No -x: it would
+# print GPG_PRIVATE_KEY and other secrets into the job logs.
+set -eo pipefail
+
+# busybox ash has no ERR trap; ping /fail from EXIT when the script failed
+trap 'rc=$?; if [ $rc -ne 0 ]; then echo "Sync FAILED (exit $rc)"; [ -n "$HEALTHCHECK_URL" ] && curl -fsS -m 10 --retry 3 "$HEALTHCHECK_URL/fail" >/dev/null || true; fi' EXIT
+
 echo "Generating rclone config..."
 TMPL="/etc/rclone.conf.tmpl"
 if [ -n "$RCLONE_TMPL" ]; then
@@ -78,7 +84,7 @@ encrypt_and_sync() {
         relative_path="${file#$GPG_TEMP_DIR/plain/}"
         encrypted_file="$encrypted_dir/$relative_path.gpg"
         mkdir -p "$(dirname "$encrypted_file")"
-        gpg --batch --trust-model always --encrypt --recipient "$GPG_KEY_ID" --output "$encrypted_file" "$file"
+        gpg --batch --trust-model always --encrypt --recipient "$GPG_KEY_ID" --output "$encrypted_file" "$file" || exit 1
     done
     
     # Upload encrypted files to destination
@@ -138,4 +144,7 @@ fi
 if [ "$GPG_ENABLED" = true ]; then
     rm -rf "$GPG_TEMP_DIR"
 fi
-curl ${HEALTHCHECK_URL}
+# The sync already succeeded; a failed ping must not fail the job
+if [ -n "$HEALTHCHECK_URL" ]; then
+    curl -fsS -m 10 --retry 3 "$HEALTHCHECK_URL" || echo "WARN: Healthchecks ping failed"
+fi
