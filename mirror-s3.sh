@@ -41,6 +41,12 @@ else
 fi
 
 echo "Running rclone sync..."
+
+# Logs ship to VictoriaLogs, not a terminal: --progress redraws its whole block
+# several times a second, and crypt prints one NOTICE per pre-crypt plaintext
+# object on B2 (millions for gsuite). One stats line every 5 minutes instead.
+STATS="--stats=5m --stats-one-line --stats-log-level=NOTICE"
+quiet() { grep -v 'Skipping undecryptable file name' || true; }
 DEBUG=""
 
 if [[ "$MINIO_DEBUG" == "1" ]]; then
@@ -58,12 +64,12 @@ fi
 if [ -n "$DO_ATOMIC" ]; then
   echo "== ATOMIC MODE ENABLED =="
   echo "=> Syncing from source..."
-  rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} ${DST}:${DESTINATION_TMP_BUCKET} --compare-dest=${DST}:${DESTINATION_BUCKET} ${EXTRA_SYNC_ARGS}
+  rclone $STATS $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} ${DST}:${DESTINATION_TMP_BUCKET} --compare-dest=${DST}:${DESTINATION_BUCKET} ${EXTRA_SYNC_ARGS} 2>&1 | quiet
   echo "=> Moving..."
   rclone --config=/etc/rclone.conf move ${DST}:${DESTINATION_TMP_BUCKET} ${DST}:${DESTINATION_BUCKET}
 else
   echo "=> Syncing from source..."
-  rclone --progress $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} ${DST}:${DESTINATION_BUCKET} ${EXTRA_SYNC_ARGS}
+  rclone $STATS $BW_LIMIT --config=/etc/rclone.conf sync sync_src:${SOURCE_BUCKET} ${DST}:${DESTINATION_BUCKET} ${EXTRA_SYNC_ARGS} 2>&1 | quiet
 fi
 
 # The sync already succeeded; a failed ping must not fail the job
